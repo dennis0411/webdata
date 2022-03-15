@@ -1,16 +1,41 @@
-# This is a sample Python script.
+import pandas as pd
+from concurrent.futures import ThreadPoolExecutor
+import tradingview
+import cnyes
+import time
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+tradingview_url = "https://tw.tradingview.com"
+
+tradingview_news_url = {"us_stock": "/markets/stocks-usa/news/",
+                        # "taiwan_stock": "/markets/stocks-taiwan/news/",
+                        "china_stock": "/markets/stocks-china/news/",
+                        "japan_stock": "/markets/stocks-japan/news/",
+                        "currency": "/markets/currencies/news/",
+                        "futures": "/markets/futures/news/",
+                        "indices": "/markets/indices/news/",
+                        "bonds": "/markets/bonds/news/",
+                        "crypto": "/markets/cryptocurrencies/news/",
+                        }
+
+cnyes_url = "https://news.cnyes.com"
+
+cnyes_news_url = {"us_stock": "/news/cat/us_stock",
+                  "world_stock": "/news/cat/wd_stock",
+                  "eu_asia_stock": "/news/cat/eu_asia_stock",
+                  "taiwan_stock": "/news/cat/tw_stock",
+                  "china_stock": "/news/cat/cn_stock",
+                  "crypto": "/news/cat/bc",
+                  "currency": "/news/cat/forex",
+                  "futures": "/news/cat/future",
+                  }
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
 
 
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    t = tradingview.tradingview_source()
+    df1 = t.return_data()
+    c = cnyes.cnyes_source()
+    df2 = c.return_data()
+    data = pd.concat([df1, df2], ignore_index=True)
+    print(data)
