@@ -11,10 +11,10 @@ np.set_printoptions(linewidth=desired_width)
 pd.set_option('display.max_columns', 10)
 
 # 網址
-news_dict = {"usa": "https://tw.tradingview.com/markets/stocks-usa/news/",
-             "taiwan": "https://tw.tradingview.com/markets/stocks-taiwan/news/",
-             "china": "https://tw.tradingview.com/markets/stocks-china/news/",
-             "japan": "https://tw.tradingview.com/markets/stocks-japan/news/",
+news_dict = {"us_stock": "https://tw.tradingview.com/markets/stocks-usa/news/",
+             "taiwan_stock": "https://tw.tradingview.com/markets/stocks-taiwan/news/",
+             "china_stock": "https://tw.tradingview.com/markets/stocks-china/news/",
+             "japan_stock": "https://tw.tradingview.com/markets/stocks-japan/news/",
              "currency": "https://tw.tradingview.com/markets/currencies/news/",
              "futures": "https://tw.tradingview.com/markets/futures/news/",
              "indices": "https://tw.tradingview.com/markets/indices/news/",
@@ -52,8 +52,8 @@ for country in news_dict.keys():
             link = "https://tw.tradingview.com" + href
             sub_r = requests.get(link)
             sub_soup = BeautifulSoup(sub_r.text, 'html.parser')
-            for tag in sub_soup.find(class_="body-2-Un7Upl body-1lnpJaR-"):
-                news.append(tag.text)
+            for sub_tag in sub_soup.find(class_="body-2-Un7Upl body-1lnpJaR-"):
+                news.append(sub_tag.text)
 
         news_data = pd.DataFrame(list(zip(date, time, source, market, title, news)),
                                  columns=["date", "time", "source", "market", "title", "news"])
