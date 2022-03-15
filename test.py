@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 import urllib.parse
 import threading
+from threading import Lock
+import time
 
 import pprint
 
@@ -25,6 +27,8 @@ cnyes_news_url = {"us_stock": "/news/cat/us_stock",
                   "futures": "/news/cat/future",
                   }
 
+lock = threading.Lock()
+
 
 # 物件化
 class cnyes_source():
@@ -40,6 +44,7 @@ class cnyes_source():
         self.word_morningstar = "晨星專欄"
 
     def download_data(self, target_url, sub_market):
+        lock.acquire()
         r = requests.get(target_url)
 
         if r.status_code != requests.codes.ok:
@@ -72,7 +77,7 @@ class cnyes_source():
                         a = p.text
                         n = n + a
                 self.news.append(n)
-
+        lock.release()
 
     def morningstar_report(self):
         word_parse = urllib.parse.quote(self.word_morningstar)
@@ -128,11 +133,16 @@ class cnyes_source():
         print("threads end")
 
 
+
+
     def return_data(self):
         self.multi()
         news_data = pd.DataFrame(list(zip(self.date, self.time, self.source, self.market, self.title, self.news)),
                                  columns=["date", "time", "source", "market", "title", "news"])
         return news_data
 
-# N = cnyes_source()
-# print(N.return_data())
+start = time.time()
+N = cnyes_source()
+print(N.return_data())
+end = time.time()
+print(end - start)

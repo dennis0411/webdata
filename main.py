@@ -1,5 +1,5 @@
 import pandas as pd
-from concurrent.futures import ThreadPoolExecutor
+from threading import Thread
 import tradingview
 import cnyes
 import time
@@ -33,9 +33,13 @@ cnyes_news_url = {"us_stock": "/news/cat/us_stock",
 
 
 if __name__ == '__main__':
+    start = time.time()
     t = tradingview.tradingview_source()
     df1 = t.return_data()
     c = cnyes.cnyes_source()
     df2 = c.return_data()
     data = pd.concat([df1, df2], ignore_index=True)
     print(data)
+    end = time.time()
+    print(f'total time: {end - start} seconds')
+
