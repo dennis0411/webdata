@@ -47,30 +47,7 @@ class morningstar_report():
         datetime = tag.text.split(' ')
         t = datetime[1]
         d = datetime[0]
-        source = 'cnyes'
-        title = soup.h1.text
-
-        for sub_tag in soup.find(class_="_1UuP"):
-            for p in sub_tag.find_all('p'):
-                a = p.text
-                news += a
-
-        self.news_data.loc[target_url, "time"] = t
-        self.news_data.loc[target_url, "date"] = d
-        self.news_data.loc[target_url, "source"] = source
-        self.news_data.loc[target_url, "title"] = title
-        self.news_data.loc[target_url, "news"] = news
-        self.news_data.loc[target_url, "link"] = target_url
-
-    def download_data(self, target_url):
-        r = requests.get(target_url)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        news = " "
-        tag = soup.find('time')
-        datetime = tag.text.split(' ')
-        t = datetime[1]
-        d = datetime[0]
-        source = 'cnyes'
+        source = 'morningstar'
         title = soup.h1.text
 
         for sub_tag in soup.find(class_="_1UuP"):
@@ -86,7 +63,6 @@ class morningstar_report():
         self.news_data.loc[target_url, "link"] = target_url
 
     def multi(self, url_list):
-        print("threads begin")
         threads = []
         for target_url in url_list:
             threads.append(threading.Thread(target=self.download_data, args=(target_url,)))
@@ -96,14 +72,8 @@ class morningstar_report():
 
         for thread in threads:
             thread.join()
-        print("threads end")
 
     def return_data(self):
+        print(f'Loading data from morningstar')
         list = self.get_url_list()
         self.multi(list)
-
-
-# M = morningstar_report()
-# M.return_data()
-#
-# print(M.news_data)

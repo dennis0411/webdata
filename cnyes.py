@@ -71,7 +71,6 @@ class cnyes_source():
         self.news_data.loc[target_url, "link"] = target_url
 
     def multi(self, url_list):
-        print("threads begin")
         threads = []
         for target_url in url_list:
             threads.append(threading.Thread(target=self.download_data, args=(target_url,)))
@@ -81,14 +80,8 @@ class cnyes_source():
 
         for thread in threads:
             thread.join()
-        print("threads end")
 
     def return_data(self):
+        print(f'Loading data from cnyes')
         list = self.get_url_list()
         self.multi(list)
-
-
-# N = cnyes_source()
-# N.return_data()
-#
-# print(N.news_data)

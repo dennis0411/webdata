@@ -85,6 +85,3 @@ class tradingview_source():
         news_data = pd.DataFrame(list(zip(self.date, self.time, self.source, self.market, self.title, self.news)),
                                  columns=["date", "time", "source", "market", "title", "news"])
         return news_data
-
-# N = tradingview_source()
-# print(N.return_data())
