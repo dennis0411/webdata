@@ -15,38 +15,52 @@ pd.set_option('display.max_columns', 10)
 
 
 # 物件化
-class tradingview_source():
+class morningstar_report():
     def __init__(self):
-        self.url = "https://tw.tradingview.com"
-        self.news_url = {"us_stock": "/markets/stocks-usa/news/",
-                         "taiwan_stock": "/markets/stocks-taiwan/news/",
-                         "china_stock": "/markets/stocks-china/news/",
-                         "japan_stock": "/markets/stocks-japan/news/",
-                         "currency": "/markets/currencies/news/",
-                         "futures": "/markets/futures/news/",
-                         "indices": "/markets/indices/news/",
-                         "bonds": "/markets/bonds/news/",
-                         "crypto": "/markets/cryptocurrencies/news/",
-                         }
+        self.url = "https://news.cnyes.com"
+        self.news_url = "https://news.cnyes.com"
         self.news_data = pd.DataFrame()
 
     def get_url_list(self):
         url_list = []
         market_list = []
-        for submarket in self.news_url.keys():
-            target_url = self.url + self.news_url.get(submarket)
-            r = requests.get(target_url)
-            soup = BeautifulSoup(r.text, 'html.parser')
-            for tag in soup.find_all(class_="_1Zdp"):
-                href = tag.get('href')
-                link = self.url + href
-                url_list.append(link)
-                market_list.append(submarket)
+        word_parse = urllib.parse.quote("晨星專欄")
+        sub_url = self.url + f'/tag/{word_parse}'
+        r = requests.get(sub_url)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        for tag in soup.find_all(class_="_K_HZ"):
+            href = tag.a.get('href')
+            link = self.url + href
+            url_list.append(link)
+            market_list.append('morningstar')
         self.news_data = pd.DataFrame(columns=["date", "time", "source", "market", "title", "news", "link"],
                                       index=url_list)
         self.news_data["market"] = market_list
 
         return url_list
+
+    def download_data(self, target_url):
+        r = requests.get(target_url)
+        soup = BeautifulSoup(r.text, 'html.parser')
+        news = " "
+        tag = soup.find('time')
+        datetime = tag.text.split(' ')
+        t = datetime[1]
+        d = datetime[0]
+        source = 'cnyes'
+        title = soup.h1.text
+
+        for sub_tag in soup.find(class_="_1UuP"):
+            for p in sub_tag.find_all('p'):
+                a = p.text
+                news += a
+
+        self.news_data.loc[target_url, "time"] = t
+        self.news_data.loc[target_url, "date"] = d
+        self.news_data.loc[target_url, "source"] = source
+        self.news_data.loc[target_url, "title"] = title
+        self.news_data.loc[target_url, "news"] = news
+        self.news_data.loc[target_url, "link"] = target_url
 
     def download_data(self, target_url):
         r = requests.get(target_url)
@@ -89,7 +103,7 @@ class tradingview_source():
         self.multi(list)
 
 
-N = cnyes_source()
-N.return_data()
-
-print(N.news_data)
+# M = morningstar_report()
+# M.return_data()
+#
+# print(M.news_data)
