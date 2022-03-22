@@ -2,9 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 import pandas as pd
 import numpy as np
-import html5lib
-import threading
-from urllib.request import urlopen
+from lxml import etree, html
 
 import pprint
 
@@ -16,19 +14,21 @@ pd.set_option('display.max_columns', 10)
 
 list = {
     "Warren Buffett’s": "https://www.buffett.online/en/portfolio/",
+    "BridgeWater": "https://whalewisdom.com/filer/bridgewater-associates-inc#tabholdings_tab_link",
 
 }
 
-
 df = pd.read_html("https://www.buffett.online/en/portfolio/")
+new_df = pd.DataFrame(df[0])
+data = new_df.iloc[1:-1].rename(columns=new_df.iloc[0])
+
+# print(data)
 
 
-
-# r = requests.get("https://www.buffett.online/en/portfolio/")
-# # print(r.json())
-# soup = BeautifulSoup(r.text, 'html.parser')
-# print(soup.h2.text)
-# tag = soup.find(class_="wp-block-table")
-# for sub_tag in tag.find_all("td"):
-#     print(sub_tag.text)
-#
+url = "https://whalewisdom.com/filer/bridgewater-associates-inc#tabholdings_tab_link"
+res = requests.get(url)
+# 用lxml的html函式來處理內容格式
+byte_data = res.content
+source_code = html.fromstring(byte_data)
+result = source_code.xpath('//*[@id="current_holdings_table"]/text()')
+print(result)
